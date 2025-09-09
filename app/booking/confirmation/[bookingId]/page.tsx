@@ -36,6 +36,13 @@ export default async function BookingConfirmationPage({ params }: { params: Prom
     notFound()
   }
 
+  // Get contract for this booking
+  const { data: contract } = await supabase
+    .from("contracts")
+    .select("*")
+    .eq("booking_id", bookingId)
+    .single()
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-GB", {
       weekday: "long",
@@ -196,13 +203,24 @@ export default async function BookingConfirmationPage({ params }: { params: Prom
                     <span className="text-primary">GH₵ {booking.total_amount}</span>
                   </div>
 
+
+                  {/* Enforce contract signing before payment */}
                   {booking.payment_status === "pending" && (
-                    <Button asChild className="w-full" size="lg">
-                      <Link href={`/payment/${booking.id}`}>
-                        Complete Payment
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
+                    contract && contract.status === "signed" ? (
+                      <Button asChild className="w-full" size="lg">
+                        <Link href={`/payment/${booking.id}`}>
+                          Complete Payment
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                    ) : (
+                      <Button asChild className="w-full" size="lg" variant="secondary">
+                        <Link href={`/contracts/${booking.id}`}>
+                          Sign Rental Agreement
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                    )
                   )}
 
                   <div className="space-y-2 pt-4">

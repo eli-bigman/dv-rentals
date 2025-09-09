@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import { createServerClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { ContractsList } from "@/components/contracts-list"
@@ -5,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
 export default async function ContractsPage() {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
 
   const {
     data: { user },
